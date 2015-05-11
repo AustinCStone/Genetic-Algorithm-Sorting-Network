@@ -42,8 +42,7 @@ class SortTestGenome:
 		#as soon as greater than half the population can solve the test, its fitness goes to epsilon.
 		list_length = len(self.genome)
 		if float(self.num_swaps)/float(self.num_attempted) < 2*list_length: #if the average genome solved it in less than list_length swaps, kill it
-			#this sort of violates the semantics of the method, but its a quick hack to get this to work better
+			#this violates the semantics of the method, but its a quick hack to get this to work better
 			self.genome = [int(m.floor((r.random()*list_length)%list_length)) for x in range(list_length)]
-			print 'here'
 		
-		return float(self.num_swaps)/float(self.num_attempted)
+		return float(self.num_attempted)/max(float(self.num_swaps), self.fitness_epsilon)

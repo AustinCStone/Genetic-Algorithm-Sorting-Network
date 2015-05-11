@@ -1,9 +1,9 @@
 import random as r
+import numpy as np
 
 class Population:
 	"""Class for maintaining a population of test and evaluator 'organisms' """
 	def __init__(self, entities, tests, create_entity_f, create_test_f):
-		print 'HERE!!!!! IN CONSTRUCTOR OF POPULATION'
 		self.entities = entities
 		self.tests = tests
 		self.entity_fitness = [0.0 for x in range(len(entities))]
@@ -22,26 +22,13 @@ class Population:
 		for test_num in range(total_num_tests):
 			self.test_fitness[test_num] = self.tests[test_num].evaluateFitness()
 
-		#create an array in which jump from element i to i+1 is equal to element i's fitness 
-		total_entity_fitness = sum(self.entity_fitness)	
-		entity_fitness_interpolate = [self.entity_fitness[0]/total_entity_fitness]
-		for entity_num in range(1, total_num_entities):
-			entity_fitness_interpolate.append( (self.entity_fitness[entity_num]/total_entity_fitness) \
-				+ entity_fitness_interpolate[entity_num-1] )
-
-		total_test_fitness = sum(self.test_fitness)
-		test_fitness_interpolate = [self.test_fitness[0]/total_test_fitness]
-		for test_num in range(1, total_num_tests):
-			test_fitness_interpolate.append( (self.test_fitness[test_num]/total_test_fitness) \
-				+ test_fitness_interpolate[test_num-1] )
-
 		next_generation_entities = []
 		for i in range(total_num_entities):
-			parent1_index = self.selectParent(entity_fitness_interpolate)
+			parent1_index = self.selectParent(self.entity_fitness)
 			#print 'p1e'
 			#print parent1_index
 			parent1 = self.entities[parent1_index]
-			parent2_index = self.selectParent(entity_fitness_interpolate)
+			parent2_index = self.selectParent(self.entity_fitness, previous_parent_index = parent1_index )
 			#print 'p2e'
 			#print parent2_index
 			parent2 = self.entities[parent2_index]
@@ -52,11 +39,11 @@ class Population:
 
 		next_generation_tests = []
 		for i in range(total_num_tests):
-			parent1_index = self.selectParent(test_fitness_interpolate)
+			parent1_index = self.selectParent(self.test_fitness)
 			#print 'p1t '
 			#print parent1_index
 			parent1 = self.tests[parent1_index]
-			parent2_index = self.selectParent(test_fitness_interpolate)
+			parent2_index = self.selectParent(self.test_fitness)
 			#print 'p2t '
 			#print parent2_index
 			parent2 = self.tests[parent2_index]
@@ -66,28 +53,48 @@ class Population:
 		
 
 
-	def selectParent(self, fitness_interpolate):
-		interpolate_value = r.random() * fitness_interpolate[-1]
-		for i in range(len(fitness_interpolate)):
-			if interpolate_value<fitness_interpolate[i]:
-				return i
-		#print 'here????'
-		return len(fitness_interpolate)-1
-
-		#standard binary search to select parent... Is log(n) the most optimal algorithm to sample population by fitness? 
-		'''min_i = 0
-		max_i = len(fitness_interpolate)
-		mid_i = (max_i + min_i)/2
-		while(max_i>=min_i):
-			if (interpolate_value>fitness_interpolate[mid_i]):
-				min_i = mid_i+1
-				mid_i = (min_i + max_i)/2
+	def selectParent(self, fitness_values, previous_parent_index=None):
+		'''If previous_parent_index is passed in, it selects a mate within a standard deviation of 5 away in either direction from the 
+		previous parent, else it selects anywhere from the population'''
+		if previous_parent_index is None:
+			rand_i = r.uniform(0, sum(fitness_values))
+			current_sum = 0.0
+			i = 0
+			for fitness_val in fitness_values:
+				current_sum += fitness_val
+				if rand_i < current_sum: 
+					return i
+				i += 1
+			return i
+		else:
+			num_fitness_values = len(fitness_values)
+			mu, sigma = float(previous_parent_index), 10.0 # mean and standard deviation
+			distance_away_can_mate = abs(int(np.random.normal(mu, sigma, 1))-int(mu)) #draw a random sample
+			lower_index = (previous_parent_index-distance_away_can_mate)%num_fitness_values
+			upper_index = (previous_parent_index+distance_away_can_mate)%num_fitness_values
+			lower_half = []
+			upper_half = []
+			if(lower_index>previous_parent_index): #wrap around
+				lower_half = fitness_values[lower_index:] + fitness_values[0:previous_parent_index]
 			else: 
-				max_i = mid_i-1
-				mid_i = (min_i + max_i)/2
-		##print 'selected parent ' + str(mid_i)
-	#	#print 'parent fitness is ' + str(self.entity_fitness[mid_i]/sum(self.entity_fitness))
-		return mid_i'''
+				lower_half = fitness_values[lower_index:previous_parent_index]
+			
+			if(upper_half<previous_parent_index): #wrap around
+				upper_half =  fitness_values[previous_parent_index:] + fitness_values[0:upper_index]
+			else:
+				upper_half = fitness_values[previous_parent_index:upper_index]
+
+			fitness_values_available_to_mate = list(lower_half+upper_half)
+			rand_i = r.uniform(0, sum(fitness_values_available_to_mate))
+			current_sum = 0.0
+			i = 0
+			for fitness_val in fitness_values_available_to_mate:
+				current_sum += fitness_val
+				if rand_i < current_sum: 
+					return (lower_index+i)%num_fitness_values
+				i += 1
+	        return (lower_index+i)%num_fitness_values
+
 
 
 

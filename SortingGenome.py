@@ -87,8 +87,9 @@ class SortingGenome:
 		test_sorting_genome.num_swaps+=swaps_from_correct
 		if(output == test_sorting_genome.solution):
 			test_sorting_genome.num_solved+=1
-		#exponentially weight performance by total swaps, linearly weight by genome length
-		return 1.0/max(float(swaps_from_correct), 0.1) + (0.01/len(test_sorting_genome.genome)**2) * len(self.genome)
+		#not clear on what this should be? n * log(n) ? 
+		min_genome_size = int(float(self.list_length) * m.log(float(self.list_length)))
+		return 1.0/max(float(swaps_from_correct), 0.1) + 5.0*(float(min_genome_size)**2)/(float(len(self.genome))**2)
 
 
 	def evaluateFitness(self, list_test_sorting_genome):

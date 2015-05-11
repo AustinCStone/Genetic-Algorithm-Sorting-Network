@@ -3,7 +3,7 @@ import SortTestGenome as stg
 import Population as p
 
 def driver(num_sorting_genomes, num_test_genomes, num_generations, list_length):
-	max_fitness_per_generation = [[]]
+	max_fitness_per_generation = []
 	sorting_genomes = [sg.SortingGenome(list_length=list_length) for x in range(num_sorting_genomes)]
 	sort_test_genomes = [stg.SortTestGenome(list_length=list_length) for x in range(num_test_genomes)]
 	population = p.Population(sorting_genomes, sort_test_genomes, sg.SortingGenome, stg.SortTestGenome)

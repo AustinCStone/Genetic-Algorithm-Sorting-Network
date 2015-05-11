@@ -1,0 +1,67 @@
+
+\documentclass[9pt]{article} 
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{epstopdf}
+\usepackage{tikz}
+\usepackage{verbatim}
+
+\title{Evolving Sorting Networks Using a Genetic Algorithm}
+\author{Austin Stone, as46569, austinstone@utexas.edu}
+
+%\date{21 Sept. 2012} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+\begin{document}
+
+\maketitle
+
+
+
+
+
+
+% \newpage
+
+
+\begin{center}
+\textbf{
+\section{Abstract}}
+\end{center}
+
+This paper describes an exploration of the potential of genetic algorithms to evolve sorting networks. 
+
+ \begin{center}
+ \textbf{
+\section{Fitness Functions}}
+\end{center}
+
+The fitness function I used to evaluate a sorting network was based on the number of swaps away from a correct sort of a test, and based on the length of the genome. I used: \\
+
+  $1.0/max(swaps\_from\_correct, 0.1) + 5.0*(min\_genome\_size)^{2})/(length\_of\_genome)^{2}$ \\
+  
+  Where swaps\_from\_correct is the number of swaps that was needed to correctly sort the input list after being processed by the sorting network (determined by running merge sort of the post processed list and counting the swaps), min\_genome\_size is the minimum possible "correct" genome (chosen to be n log(n) where n is the length of the list to be sorted.\footnote{Based on my reading, the optimal possible length is some constant factor times n log(n). See http://arxiv.org/abs/1403.2777 for details. }) Intuitively, the reason I chose to use the number of swaps from correct as a fitness proxy is because it allows for a more incremental evolution than the number of entirely-correctly sorted lists. If I were to use the number of entirely correctly sorted lists as a proxy, a genome which is one base pair away from a perfect solution could perform poorly and be rewarded a very low fitness value, whereas a genome that is far from correct but works well just for the limited test cases could be awarded highly. Furthermore, this allows a smaller number of test cases, since test cases aren't just evaluated as a binary correct or incorrect, but on a sliding scale. 
+  
+The fitness function for the test cases was $total\_number\_genomes\_attempted/total\_number\_swaps\_from\_correct$ where $total\_number\_swaps\_from\_correct$ was the cumulative sum of the swap error for all genomes which attempted to sort this test. E.g., if 3 genomes tried to sort a particular test, and genome a was 5 swaps from correct, genome b was 0 swaps from correct (i.e., sorted it perfectly), and genome c was 3 swaps from correct, this value would be 5 + 0 + 3 = 8. $total\_number\_genomes\_attempted$ was simply the cumulative number of genomes that attempted to solve 
+  
+   
+\vspace{5mm}
+\section{Method Details}
+
+
+
+\section{Results}
+
+
+\section{Conclusion}
+
+\section{Please watch the video I submitted!}
+
+
+
+\end{document}
+
+
