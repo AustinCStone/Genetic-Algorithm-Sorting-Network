@@ -2,7 +2,7 @@ import random as r
 import numpy as np
 
 class Population:
-	"""Class for maintaining a population of test and evaluator 'organisms' """
+	"""General class for maintaining a population of test and evaluator 'organisms' """
 	def __init__(self, entities, tests, create_entity_f, create_test_f):
 		self.entities = entities
 		self.tests = tests
@@ -13,6 +13,7 @@ class Population:
 
 
 	def next_generation(self):
+		"""Breed, mutate, and repopulate tests and entities"""
 		total_num_entities = len(self.entities)
 		total_num_tests = len(self.tests)
 		
@@ -22,33 +23,31 @@ class Population:
 		for test_num in range(total_num_tests):
 			self.test_fitness[test_num] = self.tests[test_num].evaluateFitness()
 
-		next_generation_entities = []
+		next_generation_entities = [None for x in range(total_num_entities)]
 		for i in range(total_num_entities):
 			parent1_index = self.selectParent(self.entity_fitness)
-			#print 'p1e'
-			#print parent1_index
+			#print 'p1e ' + str(parent1_index)
 			parent1 = self.entities[parent1_index]
 			parent2_index = self.selectParent(self.entity_fitness, previous_parent_index = parent1_index )
-			#print 'p2e'
-			#print parent2_index
+			#print 'p2e ' + str(parent2_index)
 			parent2 = self.entities[parent2_index]
-			new_entity = self.create_entity_f(parent1 = parent1, parent2 = parent2)
-			next_generation_entities.append(new_entity)
+			child_entity = self.create_entity_f(parent1 = parent1, parent2 = parent2)
+			child_location = self.placeChild(parent1_index, parent2_index, next_generation_entities)
+			#print 'child_location is ' + str(child_location)
+			next_generation_entities[child_location] = child_entity
 		self.entities = next_generation_entities
 
 
 		next_generation_tests = []
 		for i in range(total_num_tests):
 			parent1_index = self.selectParent(self.test_fitness)
-			#print 'p1t '
-			#print parent1_index
+			#print 'p1t ' + str(parent1_index)
 			parent1 = self.tests[parent1_index]
 			parent2_index = self.selectParent(self.test_fitness)
-			#print 'p2t '
-			#print parent2_index
+			#print 'p2t ' + str(parent2_index)
 			parent2 = self.tests[parent2_index]
-			new_test = self.create_test_f(parent1 = parent1, parent2 = parent2)
-			next_generation_tests.append(new_test)
+			child_test = self.create_test_f(parent1 = parent1, parent2 = parent2)
+			next_generation_tests.append(child_test)
 		self.tests = next_generation_tests
 		
 
@@ -93,9 +92,21 @@ class Population:
 				if rand_i < current_sum: 
 					return (lower_index+i)%num_fitness_values
 				i += 1
-	        return (lower_index+i)%num_fitness_values
+			return (lower_index+i)%num_fitness_values
 
-
+	def placeChild(self, parent1_index, parent2_index, next_generation_children):
+		"""Place the child as close to the parents as possible. Assumes next_generation_children is populated 
+		with None at locations that have not been taken yet"""
+		average = (parent1_index + parent2_index)/2
+		size_next_gen = len(next_generation_children)
+		dist_away = 0
+		while(dist_away<size_next_gen): 
+			if(next_generation_children[(average+dist_away)%size_next_gen]==None):
+				return (average+dist_away)%size_next_gen
+			if(next_generation_children[(average-dist_away)%size_next_gen]==None):
+				return (average-dist_away)%size_next_gen
+			dist_away+=1
+		raise Exception("Attempted to place child when the next generation population is already full")
 
 
 

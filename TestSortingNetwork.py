@@ -16,10 +16,10 @@ def testSortingGenome(sorting_genome, list_length):
 				break_flag = True
 				
 		if break_flag:
-			#print 'output is ' 
-			#print output
-			#print 'test list is '
-			#print correct_solution
+			print 'output is ' 
+			print output
+			print 'test list is '
+			print correct_solution
 			return False
 
 
