@@ -6,9 +6,9 @@ class SortingGenome:
 	"""Class for containing all the genomes"""
 	meta_mutation_rate = .5
 	meta_mutation_amount = .001
-	meta_delete_mutation_rate = .1
+	meta_delete_mutation_rate = .2
 	meta_delete_mutation_amount = .01
-	meta_copy_mutation_rate = .1
+	meta_copy_mutation_rate = .2
 	meta_copy_mutation_amount = .01
 	fitness_epsilon = 0.0000001
 	def __init__(self, list_length=None, parent1=None, parent2=None):
@@ -64,7 +64,7 @@ class SortingGenome:
 
 
 		elif list_length is not None:
-			starting_length = list_length*list_length*2 #start out with a genome longer than necessary
+			starting_length = list_length*list_length #start out with a genome longer than necessary
 			self.genome = [int(m.floor((r.random()*list_length)%list_length)) for x in range(2 * starting_length)]
 			self.mutation_rate = r.random()/20.0 #set the starting mutation rate to between 0.0 and 0.05
 			self.delete_mutation_rate = r.random()/20.0 #set the starting mutation rate to between 0.0 and 0.05
@@ -89,7 +89,7 @@ class SortingGenome:
 			test_sorting_genome.num_solved+=1
 		#not clear on what this should be? n * log(n) ? 
 		min_genome_size = int(float(self.list_length) * m.log(float(self.list_length)))
-		return 1.0/max(float(swaps_from_correct), 0.1) + 5.0*(float(min_genome_size)**2)/(float(len(self.genome))**2)
+		return 1.0/max(float(swaps_from_correct), 0.1) + (1.0/max(float(swaps_from_correct), 0.1)) * (5.0 * float(min_genome_size))/(float(len(self.genome)))
 
 
 	def evaluateFitness(self, list_test_sorting_genome):

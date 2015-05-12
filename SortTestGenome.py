@@ -3,13 +3,13 @@ import math as m
 
 class SortTestGenome:
 	"""Class for evaluating the fitness of sorting genomes"""
-	meta_mutation_amount = .04
-	meta_mutation_amount = .001
+	meta_mutation_rate = .04
+	meta_mutation_amount = .01
 	fitness_epsilon = 0.0000001
 	def __init__(self, list_length=None, parent1=None, parent2=None):
 		if parent1 is not None and parent2 is not None:
 			self.mutation_rate = (parent1.mutation_rate+parent2.mutation_rate)/2.0
-			if r.random()<self.meta_mutation_amount:
+			if r.random()<self.meta_mutation_rate:
 				self.mutation_rate += (r.random()-0.5)*self.meta_mutation_amount
 			if r.random() < .5:
 				parent1, parent2 = parent2, parent1 
